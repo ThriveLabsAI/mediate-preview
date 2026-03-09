@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mediate - Choose Your Mediator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #2D1B69 0%, #1A1A2E 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .screen-container {
+            width: 390px;
+            height: 844px;
+            background: linear-gradient(135deg, #2D1B69 0%, #1A1A2E 100%);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border-radius: 60px;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 24px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 28px;
+            letter-spacing: -0.5px;
+        }
+
+        /* Toggle Pill */
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .toggle-pill {
+            display: flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 40px;
+            padding: 4px;
+            backdrop-filter: blur(10px);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 36px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .toggle-btn.active {
+            background: #7B5EA7;
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(123, 94, 167, 0.3);
+        }
+
+        .toggle-btn:hover:not(.active) {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Grid Container */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex: 1;
+        }
+
+        /* Card */
+        .persona-card {
+            position: relative;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .persona-card:hover:not(.selected) {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .persona-card.selected {
+            border: 2px solid #9B7FD4;
+            box-shadow: 0 0 20px rgba(155, 127, 212, 0.6), inset 0 0 20px rgba(155, 127, 212, 0.1);
+            transform: scale(1.02);
+        }
+
+        .card-image-container {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            border-radius: 19px 19px 0 0;
+        }
+
+        .card-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .card-label {
+            padding: 12px 8px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .card-emoji {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .card-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        /* CTA Button */
+        .button-container {
+            padding: 0 24px 32px 24px;
+        }
+
+        .continue-btn {
+            width: 100%;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #7B5EA7 0%, #9B7FD4 100%);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.3px;
+        }
+
+        .continue-btn:hover:not(:disabled) {
+            box-shadow: 0 8px 24px rgba(123, 94, 167, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .continue-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Fade transition for card set changes */
+        .card-set {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-container">
+        <div class="content">
+            <h1 class="title">Choose your mediator</h1>
+
+            <div class="toggle-container">
+                <div class="toggle-pill">
+                    <button class="toggle-btn active" data-gender="female">Female</button>
+                    <button class="toggle-btn" data-gender="male">Male</button>
+                </div>
+            </div>
+
+            <div class="grid-container" id="gridContainer">
+                <!-- Cards will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="continue-btn" id="continueBtn" disabled>Continue</button>
+        </div>
+    </div>
+
+    <script>
+        const personaData = {
+            female: [
+                {
+                    name: 'The Sage',
+                    emoji: '🤍',
+                    image: 'portraits/female-sage.jpg'
+                },
+                {
+                    name: 'The Empath',
+                    emoji: '💙',
+                    image: 'portraits/female-empath.jpg'
+                },
+                {
+                    name: 'The Mystic',
+                    emoji: '🌙',
+                    image: '/home/ubuntu/.openclaw/workspace/mediate/assets/portraits/female-mystic-moon.png'
+                },
+                {
+                    name: 'The Elder',
+                    emoji: '✨',
+                    image: '/home/ubuntu/.openclaw/workspace/mediate/assets/portraits/female-elder-moon.png'
+                }
+            ],
+            male: [
+                {
+                    name: 'The Sage',
+                    emoji: '🤍',
+                    image: 'portraits/male-sage.jpg'
+                },
+                {
+                    name: 'The Empath',
+                    emoji: '💙',
+                    image: '/home/ubuntu/.openclaw/workspace/mediate/assets/portraits/male-empath-warm.png'
+                },
+                {
+                    name: 'The Mystic',
+                    emoji: '🌙',
+                    image: 'portraits/male-mystic.jpg'
+                },
+                {
+                    name: 'The Elder',
+                    emoji: '✨',
+                    image: 'portraits/male-elder.jpg'
+                }
+            ]
+        };
+
+        let currentGender = 'female';
+        let selectedCard = null;
+
+        const gridContainer = document.getElementById('gridContainer');
+        const continueBtn = document.getElementById('continueBtn');
+        const toggleBtns = document.querySelectorAll('.toggle-btn');
+
+        function renderCards(gender) {
+            gridContainer.innerHTML = '';
+            const personas = personaData[gender];
+
+            personas.forEach((persona, index) => {
+                const card = document.createElement('div');
+                card.className = 'persona-card';
+                card.setAttribute('data-index', index);
+                card.innerHTML = `
+                    <div class="card-image-container">
+                        <img src="${persona.image}" alt="${persona.name}">
+                    </div>
+                    <div class="card-label">
+                        <span class="card-emoji">${persona.emoji}</span>
+                        <div class="card-name">${persona.name}</div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => selectCard(card, index));
+                gridContainer.appendChild(card);
+            });
+
+            // Re-attach grid animation
+            gridContainer.classList.remove('card-set');
+            void gridContainer.offsetWidth; // Trigger reflow
+            gridContainer.classList.add('card-set');
+
+            selectedCard = null;
+            continueBtn.disabled = true;
+        }
+
+        function selectCard(cardElement, index) {
+            const allCards = document.querySelectorAll('.persona-card');
+            allCards.forEach(card => card.classList.remove('selected'));
+
+            cardElement.classList.add('selected');
+            selectedCard = { gender: currentGender, index };
+            continueBtn.disabled = false;
+        }
+
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                toggleBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                currentGender = btn.getAttribute('data-gender');
+                renderCards(currentGender);
+            });
+        });
+
+        continueBtn.addEventListener('click', () => {
+            if (selectedCard) {
+                console.log('Selected:', selectedCard);
+                // Handle continuation logic here
+                alert(`You selected: ${personaData[selectedCard.gender][selectedCard.index].name}`);
+            }
+        });
+
+        // Initial render
+        renderCards('female');
+    </script>
+</body>
+</html>
